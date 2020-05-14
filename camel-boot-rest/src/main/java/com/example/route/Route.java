@@ -23,25 +23,43 @@ public class Route extends RouteBuilder {
 
 	@Override
 	public void configure() {
-		restConfiguration().component("servlet").bindingMode(RestBindingMode.json);
 
-		rest("/student").produces("application/json").get("/hello/{name}").route().transform()
-				.simple("Hello ${header.name}, Welcome to JavaOutOfBounds.com").endRest()
+		restConfiguration().component("servlet")
+		                   .bindingMode(RestBindingMode.json);
 
-				.post("/records").consumes(MediaType.APPLICATION_JSON).produces(MediaType.APPLICATION_JSON)
-				.type(Student.class).to("direct:records");
+		rest("/student").produces("application/json")
+		                .get("/hello/{name}")
+		                .route()
+		                .transform()
+		                .simple("Hello World ${header.name}")
+		                .endRest()
+
+		                .post("/records")
+		                .consumes(MediaType.APPLICATION_JSON)
+		                .produces(MediaType.APPLICATION_JSON)
+		                .type(Student.class)
+		                .to("direct:records");
 
 		from("direct:records")// .marshal().json(JsonLibrary.Jackson)
-				.doTry().bean(mapper, "doRequestMapping")
+		                      .doTry()
+		                      .bean(mapper, "doRequestMapping")
 
-				.process(new Process()).setHeader(Exchange.HTTP_METHOD, simple("POST"))
-				.setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
-				.setHeader("Accept", constant("application/json")).removeHeader(Exchange.HTTP_PATH)
-				.marshal(jsonDataFormat).log("Outgoing Http started").log("Request : ${body}")
+		                      .process(new Process())
+		                      .setHeader(Exchange.HTTP_METHOD, simple("POST"))
+		                      .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+		                      .setHeader("Accept", constant("application/json"))
+		                      .removeHeader(Exchange.HTTP_PATH)
+		                      .marshal(jsonDataFormat)
+		                      .log("Outgoing Http started")
+		                      .log("Request : ${body}")
 
-				.to("http://localhost:9090/mock/student?bridgeEndpoint=true&amp;throwExceptionOnFailure=true")
-				.doCatch(Exception.class).bean(mapper, "doErrorResponse").marshal(jsonErrorFormat).endDoTry()
-				.unmarshal().json(JsonLibrary.Jackson);
+		                      .to("http://localhost:9090/mock/student?bridgeEndpoint=true&amp;throwExceptionOnFailure=true")
+		                      .doCatch(Exception.class)
+		                      .bean(mapper, "doErrorResponse")
+		                      .marshal(jsonErrorFormat)
+		                      .endDoTry()
+		                      .unmarshal()
+		                      .json(JsonLibrary.Jackson);
 
 	}
 }

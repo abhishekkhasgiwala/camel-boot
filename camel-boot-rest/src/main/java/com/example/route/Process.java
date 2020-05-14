@@ -11,9 +11,14 @@ public class Process implements Processor {
 	public void process(Exchange exchange) throws Exception {
 		System.out.println("****** Process **********");
 
-		Student out = exchange.getIn().getBody(Student.class);
+		Student out = exchange.getIn()
+		                      .getBody(Student.class);
+
 		System.out.println("****** " + out);
-		final String name = "From Route";
-		exchange.getIn().setBody(new Student(0L, name, "Camel SpringBoot"));
+
+		// simple transformation of outgoing request
+		final String name = "From Route " + out.getName();
+		exchange.getIn()
+		        .setBody(new Student(0L, name, "Camel SpringBoot"));
 	}
 }
