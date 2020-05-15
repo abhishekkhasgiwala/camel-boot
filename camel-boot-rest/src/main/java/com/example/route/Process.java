@@ -9,12 +9,9 @@ public class Process implements Processor {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		System.out.println("****** Process **********");
 
 		Student out = exchange.getIn()
 		                      .getBody(Student.class);
-
-		System.out.println("****** " + out);
 
 		// simple transformation of outgoing request
 		final String name = "From Route " + out.getName();
